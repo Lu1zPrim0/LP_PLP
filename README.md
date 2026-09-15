@@ -8,6 +8,7 @@ Projeto da disciplina de Paradigma da Linguagem de Programação (2026.2) - CIn,
 
 **Equipe:**
 * Luiz Primo
+* Kennedy Melo
 
 ---
 
