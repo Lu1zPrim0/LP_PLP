@@ -7,8 +7,8 @@ Projeto da disciplina de Paradigma da Linguagem de Programação (2026.2) - CIn,
 **IN1007 - Paradigmas de Linguagens de Programação**  
 
 **Equipe:**
-* Luiz Primo
-* Kennedy Melo
+* Luiz Primo (lvps@cin.cin.ufpe.br)
+* Kennedy Melo (kecm@cin.ufpe.br)
 
 ---
 
