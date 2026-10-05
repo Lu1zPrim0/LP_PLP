@@ -180,6 +180,38 @@ if ok then 42 else "erro"        -- tipo: Inteiro | String
 
 Os tipos união são, portanto, **inferidos**, e não escritos pelo programador. Eles podem ser formados a partir de qualquer tipo da linguagem: os primitivos e as enumerações declaradas.
 
+Como não há anotações de tipo, "declarar" um valor de tipo união significa ligar a um nome uma expressão cujo tipo inferido é uma união. Isso pode ser feito com as duas formas de declaração da LF1:
+
+- **Com `var`**: a variável recebe diretamente um `if` com ramos de tipos diferentes.
+
+  ```
+  let var v = if (1 == 1) then 42 else "erro"       -- v : Inteiro | String
+  in ...
+  ```
+
+- **Com `fun`**: o corpo da função é um `if` com ramos de tipos diferentes, e o tipo de retorno da função é a união (exemplo completo em 8.9).
+
+  ```
+  let fun converte n = if (n == 0) then "zero" else n    -- retorno : Inteiro | String
+  in ...
+  ```
+
+As demais formas de obter um valor de tipo união são combinações dessas duas:
+
+- **Variável ligada a uma aplicação**: `var r = converte(5)` faz `r` ter tipo `Inteiro | String`, o tipo de retorno de `converte`.
+- **Parâmetro de função**: quando uma função é aplicada a um argumento de tipo união, o parâmetro assume esse tipo dentro do corpo, como no exemplo 8.6.
+- **Uniões com mais de dois tipos**: são obtidas encadeando `else if`, como no exemplo 8.8.
+
+**O tipo de uma variável não pode ser ampliado depois da declaração.** Como a LF1 não tem atribuição, uma variável recebe seu valor uma única vez, no `let var`, e seu tipo fica fixo a partir desse ponto. Não é possível acrescentar um tipo à união de uma variável já declarada. O que se pode fazer é declarar, em um `let` interno, uma nova variável com o mesmo nome, que esconde a externa:
+
+```
+let var v = if (1 == 1) then 42 else "erro"         -- v : Inteiro | String
+in let var v = if (1 == 2) then v else true         -- novo v : Inteiro | String | Booleano
+   in ...
+```
+
+O `v` do lado direito da declaração interna é o `v` externo, pois a expressão é avaliada antes de o novo nome entrar no escopo. O `v` externo não é modificado: o novo `v` é outra variável, válida apenas no corpo do `let` interno.
+
 - **Ordem e repetição não importam.** `Inteiro | String` e `String | Inteiro` são o mesmo tipo, e `Inteiro | Inteiro` é apenas `Inteiro`. Uniões dentro de uniões são achatadas: um `if` cujos ramos têm tipos `Inteiro | String` e `Booleano` tem tipo `Inteiro | String | Booleano`.
 - **Operações da LF1 não se aplicam diretamente a uniões.** Se `v` tem tipo `Inteiro | String`, a expressão `v + 1` é rejeitada, pois `v` pode ser uma string. Antes é preciso descobrir qual é o tipo de `v`.
 - **Introspecção com `is`.** A expressão `e is T` resulta em `true` se o valor de `e` for do tipo `T`, e em `false` caso contrário. `T` pode ser `Inteiro`, `Booleano`, `String` ou o nome de uma enumeração.
@@ -404,7 +436,17 @@ Resultado: `11`. A variável `v` tem tipo `Inteiro | String | Booleano`. Cada `e
 
 No último ramo resta apenas `Booleano`, então `v` pode ser usado diretamente como condição. Os três ramos produzem `Inteiro`, que é o tipo da expressão inteira.
 
-### 8.9 Programas rejeitados pelo verificador de tipos
+### 8.9 Função que retorna um valor de tipo união
+
+```
+let fun converte n = if (n == 0) then "zero" else n
+in let var a = converte(0), var b = converte(7)
+   in (if a is String then length a else a) + (if b is String then length b else b)
+```
+
+Resultado: `11`. O tipo de retorno de `converte` é `Inteiro | String`, e por isso `a` e `b` também têm esse tipo. Em tempo de execução, `a` vale `"zero"` e `b` vale `7`. Cada `if` trata os dois casos e produz um `Inteiro`: `length a` é `4` e `b` é `7`. Por isso a soma é aceita.
+
+### 8.10 Programas rejeitados pelo verificador de tipos
 
 ```
 let var v = if (1 == 1) then 1 else "a"
