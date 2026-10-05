@@ -371,7 +371,40 @@ in let fun descreve x =
 
 Resultado: `"azul"`. O argumento tem tipo `Cor | Inteiro`. No primeiro ramo, `x` é tratado como `Cor` e pode ser comparado com `Azul`.
 
-### 8.7 Programas rejeitados pelo verificador de tipos
+### 8.7 Enumeração com `else if`
+
+```
+let enum Semaforo = Verde | Amarelo | Vermelho
+in let fun acao s =
+         if (s == Verde) then "siga"
+         else if (s == Amarelo) then "atencao"
+         else "pare"
+   in acao(Amarelo)
+```
+
+Resultado: `"atencao"`. Cada `else if` compara `s` com uma constante diferente. O último `else` cobre a constante que restou, `Vermelho`.
+
+### 8.8 União de três tipos com `else if`
+
+```
+let var v = if (1 == 1) then 10 else if (1 == 2) then "abc" else true
+in if v is Inteiro then v + 1
+   else if v is String then length v
+   else if v then 1 else 0
+```
+
+Resultado: `11`. A variável `v` tem tipo `Inteiro | String | Booleano`. Cada `else` retira da união o tipo que acabou de ser testado:
+
+| Ponto do programa | Tipo de `v` |
+|---|---|
+| Primeiro `then` | `Inteiro` |
+| Primeiro `else` | `String \| Booleano` |
+| Segundo `then` | `String` |
+| Segundo `else` | `Booleano` |
+
+No último ramo resta apenas `Booleano`, então `v` pode ser usado diretamente como condição. Os três ramos produzem `Inteiro`, que é o tipo da expressão inteira.
+
+### 8.9 Programas rejeitados pelo verificador de tipos
 
 ```
 let var v = if (1 == 1) then 1 else "a"
