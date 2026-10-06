@@ -1,0 +1,3 @@
+let enum Estado = Aberto | Fechado
+in let var s = Aberto
+   in if (s == Fechado) then "fechado" else "aberto"

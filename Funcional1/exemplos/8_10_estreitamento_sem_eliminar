@@ -1,0 +1,5 @@
+let var x = (let var v = if (1 == 1) then 10 else if (1 == 2) then "abc" else true
+             in if v is Inteiro then v + 1
+                else if v is String then v
+                else if v then v else v)
+in x

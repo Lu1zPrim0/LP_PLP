@@ -21,7 +21,7 @@
 6. [BNF estendida](#6-bnf-estendida)
 7. [Verificação de tipos e execução](#7-verificação-de-tipos-e-execução)
 8. [Exemplos](#8-exemplos)
-9. [Plano de implementação](#9-plano-de-implementação)
+9. [Implementação](#9-implementação)
 10. [Referências](#10-referências)
 
 ---
@@ -335,7 +335,9 @@ Quando a condição de um `if` tem a forma `x is T`, com `x` um identificador, o
 - no ramo `then`, `x` é tratada como sendo do tipo `T`;
 - no ramo `else`, `x` é tratada como sendo de um dos tipos possíveis de `x`, exceto `T`. Se restar apenas um tipo, `x` passa a ter exatamente esse tipo.
 
-Se `x` não pode ser do tipo `T`, o ramo `then` nunca será executado. Da mesma forma, se `x` só pode ser do tipo `T`, o ramo `else` nunca será executado. Um ramo que nunca é executado não é verificado e não contribui para o tipo do `if`. Essa regra é importante para funções: como os parâmetros têm tipos inferidos, um mesmo corpo pode ser verificado ora com um argumento `Inteiro`, ora com um argumento `String` (exemplo 8.3).
+Se `x` não pode ser do tipo `T`, o ramo `then` nunca será executado. Da mesma forma, se `x` só pode ser do tipo `T`, o ramo `else` nunca será executado. Um ramo que nunca é executado não é verificado e não contribui para o tipo do `if`.
+
+**Parâmetros de função.** Como na LF1, o corpo de uma função é verificado uma única vez, com os tipos dos parâmetros ainda por inferir. Quando o corpo testa `x is T` e `x` é um parâmetro sem tipo conhecido, o tipo de `x` passa a ser a união de `T` com o tipo que o ramo `else` exige de `x`. Se o ramo `else` não exigir nenhum tipo específico, `x` aceita, além de `T`, qualquer outro tipo. Uma chamada é aceita quando o tipo do argumento está contido nessa união (exemplo 8.3).
 
 Uma consequência direta dessa regra é que um ramo que nunca é executado pode conter qualquer expressão, inclusive uma que seria rejeitada em outro lugar. No trecho abaixo, `v` já chegou ao último `if` com tipo `Booleano`, então o teste `v is Booleano` é sempre verdadeiro, e o `else` não é verificado:
 
@@ -382,7 +384,7 @@ let fun tamanho x = if x is Inteiro then x else length x
 in tamanho("plp") + tamanho(10)
 ```
 
-Resultado: `13`. Na chamada `tamanho("plp")`, `x` é uma string, o ramo `then` é descartado e `length x` é verificado normalmente. Na chamada `tamanho(10)`, ocorre o contrário. Em ambos os casos, a função retorna um `Inteiro`.
+Resultado: `13`. No ramo `then`, `x` é tratado como `Inteiro`. No ramo `else`, `length x` exige que `x` seja uma `String`. Por isso o parâmetro é inferido como `Inteiro | String`, e as duas chamadas são aceitas. Os dois ramos produzem `Inteiro`, que é o tipo de retorno da função. Uma chamada como `tamanho(true)` é rejeitada, pois `Booleano` não está na união.
 
 ### 8.4 Valor de tipo união
 
@@ -499,23 +501,36 @@ in if (not (v is Inteiro)) then length v else 0
 ```
 Erro: a condição não tem a forma `x is T`, então `v` continua com tipo `Inteiro | String` dentro dos ramos e `length v` é rejeitado.
 
-## 9. Plano de implementação
+## 9. Implementação
 
-A implementação seguirá a organização de pacotes já existente no módulo `Funcional1`:
+A extensão foi implementada no módulo `Funcional1` **sem alterar nenhuma classe Java da LF1**. Todo comportamento novo está em classes novas, e as regras que mudam (a do `if` e a da aplicação de função) estão em subclasses que sobrescrevem apenas a verificação de tipos e herdam a avaliação. O único arquivo existente alterado é a gramática, para reconhecer a sintaxe nova.
 
 | Componente | Local | Descrição |
 |---|---|---|
-| `TipoEnum` | `lf1.plp.functional1.util` | Tipo de uma enumeração, com seu nome e suas constantes. Implementa `Tipo`. |
-| `TipoUniao` | `lf1.plp.functional1.util` | Conjunto de tipos sem repetição e sem ordem. Implementa `Tipo`. |
-| `ValorEnum` | `lf1.plp.functional1.expression` | Valor de uma constante de enumeração. |
+| `TipoEnum` | `lf1.plp.functional1.util` | Tipo de uma enumeração, identificado pelo nome. Implementa `Tipo`. |
+| `TipoUniao` | `lf1.plp.functional1.util` | Conjunto de tipos sem repetição e sem ordem, com as operações de união, pertinência e remoção usadas no estreitamento. Implementa `Tipo`. |
+| `ValorEnum` | `lf1.plp.functional1.expression` | Valor de uma constante de enumeração. Estende `ValorConcreto`, o que faz `==` funcionar sem alterar `ExpEquals`. |
 | `DecEnum` | `lf1.plp.functional1.declaration` | Declaração `enum E = C1 \| ... \| Cn`, que registra o tipo e as constantes no ambiente. |
 | `ExpChecagemTipo` | `lf1.plp.functional1.expression` | Expressão `e is T`. |
-| Alteração | `IfThenElse` | Formação de união quando os ramos têm tipos diferentes e estreitamento do tipo de `x` quando a condição é `x is T`. |
-| Alteração | `ExpEquals` | Igualdade entre constantes de uma mesma enumeração. |
-| Alteração | `AmbienteFuncional` e implementações | Registro dos nomes de enumerações visíveis em cada escopo. |
-| Alteração | `Functional1.jj` | Novos tokens (`enum`, `is`, `Inteiro`, `Booleano`, `String`) e as produções da seção 6. |
+| `IfThenElseUniao` | `lf1.plp.functional1.expression` | Subclasse de `IfThenElse`: formação de união quando os ramos têm tipos diferentes e estreitamento do tipo de `x` quando a condição é `x is T`. |
+| `AplicacaoEstendida` | `lf1.plp.functional1.expression` | Subclasse de `Aplicacao`: aceita um argumento cujo tipo está contido no tipo união do parâmetro. |
+| `AmbienteCompilacaoFuncional`, `ContextoCompilacaoFuncional` | `lf1.plp.functional1.memory` | Ambiente de compilação que também registra as enumerações visíveis em cada escopo. |
+| `ProgramaEstendido` | `lf1.plp.functional1` | Subclasse de `Programa` que verifica os tipos usando o ambiente acima. |
+| Alteração | `Functional1.jj` | Novos tokens (`enum`, `is`, `Inteiro`, `Booleano`, `String`), as produções da seção 6 e a criação de `ProgramaEstendido`, `IfThenElseUniao` e `AplicacaoEstendida` no lugar das classes originais. |
 
-A ordem prevista é: primeiro as enumerações (tipo, valor, declaração e igualdade), depois a expressão `is` e, por fim, a formação de uniões e o estreitamento de tipos no `if`.
+Todo programa aceito pela LF1 continua aceito, com o mesmo resultado. A única mudança de comportamento é a pretendida: um `if` com ramos de tipos diferentes, antes rejeitado, passa a ter tipo união.
+
+**Limitação conhecida.** Enumerações são comparadas pelo nome. Duas enumerações declaradas com o mesmo nome em escopos aninhados são, portanto, tratadas como o mesmo tipo.
+
+### Executando os exemplos
+
+Os exemplos da seção 8 estão em `Funcional1/exemplos/`, um por arquivo. O `exec:java` do Maven sempre lê o arquivo `input`, então, para rodar outro arquivo, compile e chame o interpretador diretamente:
+
+```bash
+cd Funcional1
+mvn clean generate-sources compile
+java -cp target/classes lf1.plp.functional1.parser.Func1Parser exemplos/8_3_funcao_inteiro_ou_string
+```
 
 ## 10. Referências
 
