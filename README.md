@@ -337,6 +337,17 @@ Quando a condição de um `if` tem a forma `x is T`, com `x` um identificador, o
 
 Se `x` não pode ser do tipo `T`, o ramo `then` nunca será executado. Da mesma forma, se `x` só pode ser do tipo `T`, o ramo `else` nunca será executado. Um ramo que nunca é executado não é verificado e não contribui para o tipo do `if`. Essa regra é importante para funções: como os parâmetros têm tipos inferidos, um mesmo corpo pode ser verificado ora com um argumento `Inteiro`, ora com um argumento `String` (exemplo 8.3).
 
+Uma consequência direta dessa regra é que um ramo que nunca é executado pode conter qualquer expressão, inclusive uma que seria rejeitada em outro lugar. No trecho abaixo, `v` já chegou ao último `if` com tipo `Booleano`, então o teste `v is Booleano` é sempre verdadeiro, e o `else` não é verificado:
+
+```
+let var v = if (1 == 1) then 10 else if (1 == 2) then "abc" else true
+in if v is Inteiro then v + 1
+   else if v is String then length v
+   else if v is Booleano then 0 else v + "abc"     -- aceito: o último else nunca executa
+```
+
+Isso não compromete a segurança de tipos, pois a expressão mal tipada nunca é avaliada.
+
 O estreitamento vale apenas para a forma `x is T` usada diretamente como condição. Condições compostas, como `not (x is T)` ou `(x is T) and b`, são expressões booleanas válidas, mas não alteram o tipo de `x` nos ramos.
 
 ## 8. Exemplos
@@ -446,7 +457,29 @@ in let var a = converte(0), var b = converte(7)
 
 Resultado: `11`. O tipo de retorno de `converte` é `Inteiro | String`, e por isso `a` e `b` também têm esse tipo. Em tempo de execução, `a` vale `"zero"` e `b` vale `7`. Cada `if` trata os dois casos e produz um `Inteiro`: `length a` é `4` e `b` é `7`. Por isso a soma é aceita.
 
-### 8.10 Programas rejeitados pelo verificador de tipos
+### 8.10 Estreitamento que não elimina a união
+
+```
+let var x = (let var v = if (1 == 1) then 10 else if (1 == 2) then "abc" else true
+             in if v is Inteiro then v + 1
+                else if v is String then v
+                else if v then v else v)
+in x
+```
+
+Resultado: `11`. Como no exemplo 8.8, cada `else` retira um tipo da união, e `v` pode ser usado com segurança em cada ramo:
+
+| Ramo | Tipo de `v` | Expressão | Tipo do ramo |
+|---|---|---|---|
+| Primeiro `then` | `Inteiro` | `v + 1` | `Inteiro` |
+| Segundo `then` | `String` | `v` | `String` |
+| `if v then v else v` | `Booleano` | `v` | `Booleano` |
+
+A diferença em relação ao 8.8 é que aqui os ramos produzem tipos diferentes. Por isso o `if` forma de novo uma união, e `x` tem tipo `Inteiro | String | Booleano`. O estreitamento permite usar `v` dentro de cada ramo, mas não elimina a união do valor resultante. Para usar `x` em uma operação como `x + 1`, é preciso testá-lo novamente com `is`.
+
+Um detalhe: `if v then v else v` equivale a escrever só `v`. Os dois ramos são iguais, então não muda nem o tipo nem o valor.
+
+### 8.11 Programas rejeitados pelo verificador de tipos
 
 ```
 let var v = if (1 == 1) then 1 else "a"
