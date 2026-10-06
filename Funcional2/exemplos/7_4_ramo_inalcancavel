@@ -1,0 +1,4 @@
+let var v = if (1 == 1) then 10 else if (1 == 2) then "abc" else true
+in if v is Inteiro then v + 1
+   else if v is String then length v
+   else if v is Booleano then 0 else v + "abc"

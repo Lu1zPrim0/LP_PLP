@@ -1,0 +1,1 @@
+(fn x . if x is Inteiro then x else length x)("abcd")

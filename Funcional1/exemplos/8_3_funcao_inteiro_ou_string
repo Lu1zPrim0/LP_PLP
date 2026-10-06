@@ -1,0 +1,2 @@
+let fun tamanho x = if x is Inteiro then x else length x
+in tamanho("plp") + tamanho(10)

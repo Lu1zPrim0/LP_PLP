@@ -1,0 +1,2 @@
+let var v = if (1 == 1) then 42 else "erro"
+in if v is Inteiro then v + 1 else 0

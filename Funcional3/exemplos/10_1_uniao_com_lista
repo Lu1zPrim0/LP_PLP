@@ -1,0 +1,2 @@
+let var v = if (1 == 1) then [1, 2] else "x"
+in if v is String then length v else head v

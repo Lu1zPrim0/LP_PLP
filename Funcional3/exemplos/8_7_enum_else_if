@@ -1,0 +1,6 @@
+let enum Semaforo = Verde | Amarelo | Vermelho
+in let fun acao s =
+         if (s == Verde) then "siga"
+         else if (s == Amarelo) then "atencao"
+         else "pare"
+   in acao(Amarelo)

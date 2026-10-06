@@ -1,0 +1,3 @@
+let enum Cor = A | B
+in let fun aplica f x = f(x)
+   in aplica(fn c . c == A, A)
