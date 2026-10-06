@@ -1,0 +1,2 @@
+let fun ehTexto x = x is String
+in ehTexto(true)

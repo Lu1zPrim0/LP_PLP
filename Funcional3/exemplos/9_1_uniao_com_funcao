@@ -1,0 +1,2 @@
+let var f = if (1 == 1) then fn x . x + 1 else 0
+in if f is Inteiro then f else f(2)

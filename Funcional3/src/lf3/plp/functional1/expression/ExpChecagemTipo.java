@@ -1,18 +1,18 @@
-package lf1.plp.functional1.expression;
+package lf3.plp.functional1.expression;
 
-import lf1.plp.expressions1.util.Tipo;
-import lf1.plp.expressions1.util.TipoPrimitivo;
-import lf1.plp.expressions2.expression.Expressao;
-import lf1.plp.expressions2.expression.Valor;
-import lf1.plp.expressions2.expression.ValorBooleano;
-import lf1.plp.expressions2.expression.ValorInteiro;
-import lf1.plp.expressions2.expression.ValorString;
-import lf1.plp.expressions2.memory.AmbienteCompilacao;
-import lf1.plp.expressions2.memory.AmbienteExecucao;
-import lf1.plp.expressions2.memory.VariavelJaDeclaradaException;
-import lf1.plp.expressions2.memory.VariavelNaoDeclaradaException;
-import lf1.plp.functional1.memory.AmbienteCompilacaoFuncional;
-import lf1.plp.functional1.util.TipoEnum;
+import lf3.plp.expressions1.util.Tipo;
+import lf3.plp.expressions1.util.TipoPrimitivo;
+import lf3.plp.expressions2.expression.Expressao;
+import lf3.plp.expressions2.expression.Valor;
+import lf3.plp.expressions2.expression.ValorBooleano;
+import lf3.plp.expressions2.expression.ValorInteiro;
+import lf3.plp.expressions2.expression.ValorString;
+import lf3.plp.expressions2.memory.AmbienteCompilacao;
+import lf3.plp.expressions2.memory.AmbienteExecucao;
+import lf3.plp.expressions2.memory.VariavelJaDeclaradaException;
+import lf3.plp.expressions2.memory.VariavelNaoDeclaradaException;
+import lf3.plp.functional1.memory.AmbienteCompilacaoFuncional;
+import lf3.plp.functional1.util.TipoEnum;
 
 /**
  * Expressao de verificacao de tipo: e is T

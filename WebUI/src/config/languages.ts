@@ -73,13 +73,14 @@ export const AVAILABLE_LANGUAGES: NotebookLanguage[] = [
     builtins: ["Inteiro", "Booleano", "String"],
   }),
   defineLanguage("Func2", "cell", {
-    keywords: ["not", "length", "and", "or", "let", "var", "in", "fun", "fn", "if", "then", "else"],
+    keywords: ["not", "length", "and", "or", "let", "var", "in", "fun", "fn", "if", "then", "else", "enum", "is"],
     literals: ["true", "false"],
+    builtins: ["Inteiro", "Booleano", "String"],
   }),
   defineLanguage("Func3", "cell", {
-    keywords: ["not", "length", "and", "or", "let", "var", "in", "fun", "fn", "if", "then", "else", "for"],
+    keywords: ["not", "length", "and", "or", "let", "var", "in", "fun", "fn", "if", "then", "else", "for", "enum", "is"],
     literals: ["true", "false"],
-    builtins: ["head", "tail"],
+    builtins: ["head", "tail", "Inteiro", "Booleano", "String"],
   }),
   defineLanguage("Imp1", "notebook", {
     keywords: ["not", "length", "and", "or", "var", "while", "do", "if", "then", "else", "write", "read"],

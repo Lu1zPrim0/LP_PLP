@@ -1,13 +1,13 @@
-package lf1.plp.functional1.expression;
+package lf2.plp.functional1.expression;
 
-import lf1.plp.expressions1.util.Tipo;
-import lf1.plp.expressions2.expression.Expressao;
-import lf1.plp.expressions2.expression.Id;
-import lf1.plp.expressions2.memory.AmbienteCompilacao;
-import lf1.plp.expressions2.memory.VariavelJaDeclaradaException;
-import lf1.plp.expressions2.memory.VariavelNaoDeclaradaException;
-import lf1.plp.functional1.util.TipoPolimorfico;
-import lf1.plp.functional1.util.TipoUniao;
+import lf2.plp.expressions1.util.Tipo;
+import lf2.plp.expressions2.expression.Expressao;
+import lf2.plp.expressions2.expression.Id;
+import lf2.plp.expressions2.memory.AmbienteCompilacao;
+import lf2.plp.expressions2.memory.VariavelJaDeclaradaException;
+import lf2.plp.expressions2.memory.VariavelNaoDeclaradaException;
+import lf2.plp.functional1.util.TipoPolimorfico;
+import lf2.plp.functional1.util.TipoUniao;
 
 /**
  * If da LF1 estendido com uniao de tipos.

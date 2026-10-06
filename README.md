@@ -521,7 +521,25 @@ A extensão foi implementada no módulo `Funcional1` **sem alterar nenhuma class
 Todo programa aceito pela LF1 continua aceito, com o mesmo resultado. A única mudança de comportamento é a pretendida: um `if` com ramos de tipos diferentes, antes rejeitado, passa a ter tipo união.
 
 **Limitação conhecida.** Enumerações são comparadas pelo nome. Duas enumerações declaradas com o mesmo nome em escopos aninhados são, portanto, tratadas como o mesmo tipo.
+-------------------------------------------------------------------
+### Funcional 2 e Funcional 3
 
+Os módulos `Funcional2` e `Funcional3` não dependem do `Funcional1`: cada um tem a sua própria cópia de toda a hierarquia de classes, com prefixo de pacote próprio (`lf2.plp.*` e `lf3.plp.*`). Por isso a extensão foi portada para cada um deles, com as mesmas classes e a mesma estratégia, sem alterar nenhuma classe existente:
+
+- `TipoEnum`, `TipoUniao`, `ValorEnum`, `ExpChecagemTipo`, `IfThenElseUniao`, `AmbienteCompilacaoFuncional` e `ContextoCompilacaoFuncional` são idênticos aos da LF1, a menos do pacote.
+- `DecEnum` implementa a interface de declarações dessas linguagens, que tem `incluir(..., boolean)` e `reduzir`. Na redução, cada constante é substituída pelo seu valor, como as demais variáveis.
+- `AplicacaoEstendida` estende a `Aplicacao` da LF2, em que a função aplicada pode ser qualquer expressão (um identificador, uma função anônima `fn x . e` ou uma aplicação). Aplicar uma expressão cujo tipo não é função, como uma união, é um erro de tipo.
+- `ProgramaEstendido` estende o `Programa` de cada linguagem.
+
+Como funções (e, na LF3, listas) são valores nessas linguagens, elas também podem ser membros de uma união:
+
+```
+let var f = if (1 == 1) then fn x . x + 1 else 0
+in if f is Inteiro then f else f(2)          -- resultado: 3
+```
+
+O `is` só testa tipos primitivos e enumerações: uma função ou uma lista nunca é `Inteiro`, `Booleano`, `String` ou um enum. Os exemplos de cada linguagem estão em `Funcional2/exemplos/` e `Funcional3/exemplos/`.
+-------------------------------------------------------------------
 ### Executando os exemplos
 
 Os exemplos da seção 8 estão em `Funcional1/exemplos/`, um por arquivo. O `exec:java` do Maven sempre lê o arquivo `input`, então, para rodar outro arquivo, compile e chame o interpretador diretamente:

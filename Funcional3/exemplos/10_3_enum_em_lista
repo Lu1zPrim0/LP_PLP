@@ -1,0 +1,2 @@
+let enum Cor = A | B | C
+in [c == B for c in [A, B, C]]

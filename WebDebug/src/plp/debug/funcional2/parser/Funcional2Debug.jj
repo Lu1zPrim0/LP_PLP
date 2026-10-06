@@ -42,6 +42,15 @@ import plp.debug.funcional2.ValorFuncaoDebug;
 import lf2.plp.functional1.declaration.DeclaracaoFuncional;
 import lf2.plp.functional1.declaration.DecVariavel;
 import lf2.plp.functional1.expression.IfThenElse;
+import lf2.plp.functional1.declaration.DecEnum;
+import lf2.plp.functional1.expression.IfThenElseUniao;
+import lf2.plp.functional1.expression.ExpChecagemTipo;
+import lf2.plp.functional1.expression.ValorEnum;
+import lf2.plp.functional1.util.TipoEnum;
+import lf2.plp.expressions1.util.Tipo;
+import lf2.plp.expressions1.util.TipoPrimitivo;
+import lf2.plp.functional2.expression.AplicacaoEstendida;
+import lf2.plp.functional2.ProgramaEstendido;
 //Imports da Express�o2
 import lf2.plp.expressions2.expression.Expressao;
 import lf2.plp.expressions2.expression.Valor;
@@ -118,6 +127,11 @@ public class Func2DebugParser
       {
         ValorString valStr = (ValorString) val;
         System.out.println("Funcional 2 PLP Parser Version 0.0.1: resultado=" + valStr.valor());
+      }
+      else if (val instanceof ValorEnum)
+      {
+        ValorEnum valEnum = (ValorEnum) val;
+        System.out.println("Funcional 2 PLP Parser Version 0.0.1: resultado=" + valEnum.valor());
       }
       else if (val instanceof ValorInteiro)
       {
@@ -201,6 +215,15 @@ TOKEN : /* TOKENS DE FUNCIONAL 2 */
 | < ELSE : "else" >
 | < FUNC : "fun" >
 | < FN : "fn" >
+}
+
+TOKEN : /* TOKENS DE ENUMERACOES E UNIAO DE TIPOS */
+{
+  < ENUM : "enum" >
+| < IS : "is" >
+| < INTEIRO : "Inteiro" >
+| < BOOLEANO : "Booleano" >
+| < TSTRING : "String" >
 }
 
 TOKEN : /* LITERALS */
@@ -482,7 +505,7 @@ Expressao PAplicacao() :
 {
   id = PId() < LPAREN > lista = PListaExpr() < RPAREN >
   {
-    return new Aplicacao(id, lista);
+    return new AplicacaoEstendida(id, lista);
   }
 }
 
@@ -544,6 +567,30 @@ DeclaracaoFuncional PDeclFuncao() :
   }
 }
 
+DeclaracaoFuncional PDeclEnum() :
+{
+  Id id;
+  Id constante;
+  List < Id > constantes = new ArrayList < Id > ();
+}
+{
+  (
+    < ENUM > id = PId() < ASSIGN > constante = PId()
+    {
+      constantes.add(constante);
+    }
+    (
+      < BIT_OR > constante = PId()
+      {
+        constantes.add(constante);
+      }
+    )*
+  )
+  {
+    return new DecEnum(id, constantes);
+  }
+}
+
 DecComposta PDecComposta() :
 {
 	DeclaracaoFuncional d1;
@@ -553,6 +600,7 @@ DecComposta PDecComposta() :
   	(
   	  d1 = PDeclVar()
   	| d1 = PDeclFuncao()
+  	| d1 = PDeclEnum()
   	)
 	<COMMA> d2 = PDeclFuncional()
 	{return new DecComposta(d1, d2);}
@@ -568,8 +616,11 @@ DeclaracaoFuncional PDeclFuncional() :
     decl = PDecComposta()
   | LOOKAHEAD(PDeclFuncao() < COMMA >)
   	decl = PDecComposta()
+  | LOOKAHEAD(PDeclEnum() < COMMA >)
+  	decl = PDecComposta()
   | decl = PDeclVar()
   | decl = PDeclFuncao()
+  | decl = PDeclEnum()
   | < LPAREN > decl = PDeclFuncional() < RPAREN >
   )
   {
@@ -603,7 +654,7 @@ Expressao PExpCondicional() :
   < IF > expCond = PExpressao() < THEN > expThen = PExpressao() 
   < ELSE > expElse = PExpressao()
   {
-    return new IfThenElse(expCond, expThen, expElse);
+    return new IfThenElseUniao(expCond, expThen, expElse);
   }
 }
 
@@ -660,9 +711,33 @@ Expressao PExpUnaria() :
   }
 }
 
+Tipo PTipo() :
+{
+  Id id;
+}
+{
+  < INTEIRO >
+  {
+    return TipoPrimitivo.INTEIRO;
+  }
+| < BOOLEANO >
+  {
+    return TipoPrimitivo.BOOLEANO;
+  }
+| < TSTRING >
+  {
+    return TipoPrimitivo.STRING;
+  }
+| id = PId()
+  {
+    return new TipoEnum(id);
+  }
+}
+
 Expressao PExpBinaria() :
 {
   Expressao retorno, param2;
+  Tipo tipo;
   Id id;
   List list = null;
 }
@@ -674,10 +749,14 @@ Expressao PExpBinaria() :
       {
         retorno = new ExpEquals(retorno, param2);
       }
+    | < IS > tipo = PTipo()
+      {
+        retorno = new ExpChecagemTipo(retorno, tipo);
+      }
     | 
       < LPAREN > [ list = PListaExpr() ] < RPAREN >
       {
-        retorno = new Aplicacao((Expressao) retorno, list);
+        retorno = new AplicacaoEstendida((Expressao) retorno, list);
       }
     )*
   )
@@ -763,6 +842,6 @@ Programa PPrograma() :
   retorno = PExpressao()
   {
     //System.out.println("Expressao=" + retorno);
-    return new Programa(retorno);
+    return new ProgramaEstendido(retorno);
   }
 }

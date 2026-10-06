@@ -1,0 +1,5 @@
+let enum Cor = Vermelho | Verde | Azul
+in let fun descreve x =
+         if x is Cor then (if (x == Azul) then "azul" else "outra cor")
+         else "numero"
+   in descreve(if (1 == 1) then Azul else 0)

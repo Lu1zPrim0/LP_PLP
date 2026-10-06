@@ -1,0 +1,3 @@
+let fun converte n = if (n == 0) then "zero" else n
+in let var a = converte(0), var b = converte(7)
+   in (if a is String then length a else a) + (if b is String then length b else b)

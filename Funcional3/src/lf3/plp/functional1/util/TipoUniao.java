@@ -1,12 +1,12 @@
-package lf1.plp.functional1.util;
+package lf3.plp.functional1.util;
 
-import static lf1.plp.expressions1.util.ToStringProvider.listToString;
+import static lf3.plp.expressions1.util.ToStringProvider.listToString;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import lf1.plp.expressions1.util.Tipo;
+import lf3.plp.expressions1.util.Tipo;
 
 /**
  * Uniao de tipos, por exemplo Inteiro | String.
