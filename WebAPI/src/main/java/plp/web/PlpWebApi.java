@@ -131,7 +131,7 @@ public final class PlpWebApi {
     lf1.plp.functional1.Programa prog = plp.debug.funcional1.parser.Func1DebugParser.Input();
     message = "sintaxe verificada com sucesso!";
     plp.debug.funcional1.AmbienteCompilacaoDebug ambienteDebug =
-        new plp.debug.funcional1.AmbienteCompilacaoDebug(new lf1.plp.expressions2.memory.ContextoCompilacao());
+        new plp.debug.funcional1.AmbienteCompilacaoFuncionalDebug(new lf1.plp.functional1.memory.ContextoCompilacaoFuncional());
     if (prog.getExpressao().checaTipo(ambienteDebug)) {
       compilationEnv = compilationEnvJson("func1", ambienteDebug.getRecorder().getSnapshot());
       output = prog.executar().toString();

@@ -68,8 +68,9 @@ export const AVAILABLE_LANGUAGES: NotebookLanguage[] = [
     literals: ["true", "false"],
   }),
   defineLanguage("Func1", "cell", {
-    keywords: ["not", "length", "and", "or", "let", "var", "in", "fun", "if", "then", "else"],
+    keywords: ["not", "length", "and", "or", "let", "var", "in", "fun", "if", "then", "else", "enum", "is"],
     literals: ["true", "false"],
+    builtins: ["Inteiro", "Booleano", "String"],
   }),
   defineLanguage("Func2", "cell", {
     keywords: ["not", "length", "and", "or", "let", "var", "in", "fun", "fn", "if", "then", "else"],

@@ -32,6 +32,14 @@ import lf1.plp.functional1.declaration.DecComposta;
 import lf1.plp.functional1.expression.ExpDeclaracao;
 import lf1.plp.functional1.expression.IfThenElse;
 import lf1.plp.functional1.expression.Aplicacao;
+import lf1.plp.functional1.declaration.DecEnum;
+import lf1.plp.functional1.expression.IfThenElseUniao;
+import lf1.plp.functional1.expression.AplicacaoEstendida;
+import lf1.plp.functional1.expression.ExpChecagemTipo;
+import lf1.plp.functional1.expression.ValorEnum;
+import lf1.plp.functional1.util.TipoEnum;
+import lf1.plp.expressions1.util.Tipo;
+import lf1.plp.expressions1.util.TipoPrimitivo;
 import java.util.*;
 import lf1.plp.expressions2.expression.ExpAnd;
 import lf1.plp.expressions2.expression.ExpConcat;
@@ -120,6 +128,11 @@ public class Func1DebugParser
         ValorBooleano valBool = (ValorBooleano) val;
         System.out.println("Funcional 1 PLP Parser Version 0.0.1: resultado=" + valBool.valor());
       }
+      else if (val instanceof ValorEnum)
+      {
+        ValorEnum valEnum = (ValorEnum) val;
+        System.out.println("Funcional 1 PLP Parser Version 0.0.1: resultado=" + valEnum.valor());
+      }
     }
     catch (Exception e)
     {
@@ -186,6 +199,15 @@ TOKEN : /* TOKENS DE FUNCIONAL 1 */
 | < THEN : "then" >
 | < ELSE : "else" >
 | < FUNC : "fun" >
+}
+
+TOKEN : /* TOKENS DE ENUMERACOES E UNIAO DE TIPOS */
+{
+  < ENUM : "enum" >
+| < IS : "is" >
+| < INTEIRO : "Inteiro" >
+| < BOOLEANO : "Booleano" >
+| < TSTRING : "String" >
 }
 
 TOKEN : /* LITERALS */
@@ -458,6 +480,30 @@ DeclaracaoFuncional PDeclFuncao() :
   }
 }
 
+DeclaracaoFuncional PDeclEnum() :
+{
+  Id id;
+  Id constante;
+  List < Id > constantes = new ArrayList < Id > ();
+}
+{
+  (
+    < ENUM > id = PId() < ASSIGN > constante = PId()
+    {
+      constantes.add(constante);
+    }
+    (
+      < BIT_OR > constante = PId()
+      {
+        constantes.add(constante);
+      }
+    )*
+  )
+  {
+    return new DecEnum(id, constantes);
+  }
+}
+
 DecComposta PDecComposta() :
 {
 	DeclaracaoFuncional d1;
@@ -467,6 +513,7 @@ DecComposta PDecComposta() :
   	(
   	  d1 = PDeclVar()
   	| d1 = PDeclFuncao()
+  	| d1 = PDeclEnum()
   	)
 	<COMMA> d2 = PDeclFuncional()
 	{return new DecComposta(d1, d2);}
@@ -482,8 +529,11 @@ DeclaracaoFuncional PDeclFuncional() :
     decl = PDecComposta()
   | LOOKAHEAD(PDeclFuncao() < COMMA >)
   	decl = PDecComposta()
+  | LOOKAHEAD(PDeclEnum() < COMMA >)
+  	decl = PDecComposta()
   | decl = PDeclVar()
   | decl = PDeclFuncao()
+  | decl = PDeclEnum()
   | < LPAREN > decl = PDeclFuncional() < RPAREN >
   )
   {
@@ -516,7 +566,7 @@ Expressao PExpCondicional() :
 {
   < IF > expCond = PExpressao() < THEN > expThen = PExpressao() < ELSE > expElse = PExpressao()
   {
-    return new IfThenElse(expCond, expThen, expElse);
+    return new IfThenElseUniao(expCond, expThen, expElse);
   }
 }
 
@@ -542,7 +592,7 @@ Expressao PAplicacao() :
     < RPAREN >
   )
   {
-    return new Aplicacao(id, expressoes);
+    return new AplicacaoEstendida(id, expressoes);
   }
 }
 
@@ -573,9 +623,33 @@ Expressao PExpUnaria() :
   }
 }
 
+Tipo PTipo() :
+{
+  Id id;
+}
+{
+  < INTEIRO >
+  {
+    return TipoPrimitivo.INTEIRO;
+  }
+| < BOOLEANO >
+  {
+    return TipoPrimitivo.BOOLEANO;
+  }
+| < TSTRING >
+  {
+    return TipoPrimitivo.STRING;
+  }
+| id = PId()
+  {
+    return new TipoEnum(id);
+  }
+}
+
 Expressao PExpBinaria() :
 {
   Expressao retorno, param2;
+  Tipo tipo;
 }
 {
   (
@@ -584,6 +658,10 @@ Expressao PExpBinaria() :
       < EQ > param2 = PExpBinaria2()
       {
         retorno = new ExpEquals(retorno, param2);
+      }
+    | < IS > tipo = PTipo()
+      {
+        retorno = new ExpChecagemTipo(retorno, tipo);
       }
     )*
   )
@@ -661,6 +739,6 @@ Programa PPrograma() :
   retorno = PExpressao()
   {
     //System.out.println("Expressao=" + retorno);
-    return new Programa(retorno);
+    return new ProgramaEstendido(retorno);
   }
 }
