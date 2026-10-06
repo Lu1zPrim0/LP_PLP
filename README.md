@@ -88,6 +88,18 @@ mvn clean generate-sources compile exec:java
 
 Por padrão, o interpretador lê o programa do arquivo `Funcional1/input`, verifica os tipos, executa e imprime o resultado.
 
+### Executando na IDE web (WebUI)
+
+Requer Node 20 ou superior. Usa o interpretador já compilado em `WebUI/public/plp.js`:
+
+```bash
+cd WebUI
+npm install
+npm run dev
+```
+
+A IDE abre em <http://localhost:4004>.
+
 ## 4. A linguagem base: Funcional 1 (LF1)
 
 A LF1 estende a Linguagem de Expressões 2 com **funções parametrizadas e recursivas**. O corpo de uma função é uma expressão, e a aplicação de uma função produz um valor. Os tipos são inferidos: não há anotações de tipo na sintaxe.
