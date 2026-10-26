@@ -13,23 +13,27 @@ order: 3
     - mapeamento de identificadores (nomes de função) em definições de função
 - Um programa é uma expressão
 
+**Extensão (projeto): enumerações e união de tipos.** Os elementos marcados com (+) foram acrescentados pela extensão. Os links de `Programa`, `Aplicacao` e `IfThenElse` apontam para as subclasses que implementam as novas regras de tipos.
+
 ## Fontes
 
-{% include code-link.html path="Funcional1/src/lf1/plp/functional1/Programa.java" %} ::= {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/Expressao.java" %}
+{% include code-link.html path="Funcional1/src/lf1/plp/functional1/ProgramaEstendido.java" content='Programa' %} ::= {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/Expressao.java" %}
 
 Expressao ::= {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/Valor.java" %}\
 {% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/ExpUnaria.java" %}\
 {% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/ExpBinaria.java" %}\
 {% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/functional1/expression/ExpDeclaracao.java" %}\
 {% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/Id.java" %}\
-{% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/functional1/expression/Aplicacao.java" %}\
-{% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/functional1/expression/IfThenElse.java" %}
+{% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/functional1/expression/AplicacaoEstendida.java" content='Aplicacao' %}\
+{% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/functional1/expression/IfThenElseUniao.java" content='IfThenElse' %}\
+{% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/functional1/expression/ExpChecagemTipo.java" %} (+)
 
 Valor ::= {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/ValorConcreto.java" %}
 
 ValorConcreto ::= {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/ValorInteiro.java" %}\
 {% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/ValorBooleano.java" %}\
-{% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/ValorString.java" %}
+{% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/ValorString.java" %}\
+{% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/functional1/expression/ValorEnum.java" %} (+)
 
 ExpUnaria ::= {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/ExpMenos.java" content='"-" Expressao' %}  
 {% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/expression/ExpNot.java" content='"not" Expressao' %}  
@@ -47,6 +51,7 @@ ExpDeclaracao ::= "let" {% include code-link.html path="Funcional1/src/lf1/plp/f
 DeclaracaoFuncional ::= {% include code-link.html path="Funcional1/src/lf1/plp/functional1/declaration/DecVariavel.java" %}  
 {% include code-indent.html %} | {% include code-link.html path="Funcional1/src/lf1/plp/functional1/declaration/DecFuncao.java" %}  
 {% include code-indent.html %} | {% include code-link.html path="Funcional1/src/lf1/plp/functional1/declaration/DecComposta.java" %}
+{% include code-indent.html %} | {% include code-link.html path="Funcional1/src/lf1/plp/functional1/declaration/DecEnum.java" %} (+)
 
 DecVariavel ::= "var" Id "=" Expressao
 
@@ -62,6 +67,15 @@ ListExp ::= Expressao \| Expressao, ListExp
 
 IfThenElse ::= "if" Expressao "then" Expressao "else" Expressao
 
+DecEnum ::= "enum" Id "=" ListConstEnum (+)
+
+ListConstEnum ::= Id \| Id "\|" ListConstEnum (+)
+
+ExpChecagemTipo ::= Expressao "is" Tipo (+)
+
+Tipo ::= {% include code-link.html path="Funcional1/src/lf1/plp/expressions1/util/TipoPrimitivo.java" content='"Inteiro" \| "Booleano" \| "String"' %}\
+{% include code-indent.html %}| {% include code-link.html path="Funcional1/src/lf1/plp/functional1/util/TipoEnum.java" content='Id' %} (+)
+
 
 ## Classes Auxiliares
 
@@ -69,10 +83,14 @@ IfThenElse ::= "if" Expressao "then" Expressao "else" Expressao
 
 {% include code-link.html path="Funcional1/src/lf1/plp/expressions1/util/Tipo.java" %}\
 {% include code-link.html path="Funcional1/src/lf1/plp/functional1/util/TipoFuncao.java" %}\
-{% include code-link.html path="Funcional1/src/lf1/plp/functional1/util/TipoPolimorfico.java" %}
+{% include code-link.html path="Funcional1/src/lf1/plp/functional1/util/TipoPolimorfico.java" %}\
+{% include code-link.html path="Funcional1/src/lf1/plp/functional1/util/TipoEnum.java" %} (+)\
+{% include code-link.html path="Funcional1/src/lf1/plp/functional1/util/TipoUniao.java" %} (+)
 
 {% include code-link.html path="Funcional1/src/lf1/plp/expressions2/memory/AmbienteCompilacao.java" %}\
-{% include code-link.html path="Funcional1/src/lf1/plp/expressions2/memory/ContextoCompilacao.java" %}
+{% include code-link.html path="Funcional1/src/lf1/plp/expressions2/memory/ContextoCompilacao.java" %}\
+{% include code-link.html path="Funcional1/src/lf1/plp/functional1/memory/AmbienteCompilacaoFuncional.java" %} (+)\
+{% include code-link.html path="Funcional1/src/lf1/plp/functional1/memory/ContextoCompilacaoFuncional.java" %} (+)
 
 {% include code-link.html path="Funcional1/src/lf1/plp/functional1/memory/AmbienteFuncional.java" %}\
 {% include code-link.html path="Funcional1/src/lf1/plp/functional1/memory/AmbienteExecucaoFuncional.java" %}\
@@ -81,7 +99,21 @@ IfThenElse ::= "if" Expressao "then" Expressao "else" Expressao
 
 ## Exemplos de Programas
 
-{% include code-link.html path="Funcional1/Exemplo.txt" %}
+{% include code-link.html path="Funcional1/input" %}\
+{% include code-link.html path="Funcional1/exemplos/7_4_ramo_inalcancavel" %}\
+{% include code-link.html path="Funcional1/exemplos/8_1_enum_casos" %}\
+{% include code-link.html path="Funcional1/exemplos/8_2_enum_variavel" %}\
+{% include code-link.html path="Funcional1/exemplos/8_3_funcao_inteiro_ou_string" %}\
+{% include code-link.html path="Funcional1/exemplos/8_4_valor_uniao" %}\
+{% include code-link.html path="Funcional1/exemplos/8_5_is" %}\
+{% include code-link.html path="Funcional1/exemplos/8_6_enum_na_uniao" %}\
+{% include code-link.html path="Funcional1/exemplos/8_7_enum_else_if" %}\
+{% include code-link.html path="Funcional1/exemplos/8_8_uniao_tres_tipos" %}\
+{% include code-link.html path="Funcional1/exemplos/8_9_funcao_retorna_uniao" %}\
+{% include code-link.html path="Funcional1/exemplos/8_10_estreitamento_sem_eliminar" %}\
+{% include code-link.html path="Funcional1/exemplos/8_11_erro_enums_diferentes" %}\
+{% include code-link.html path="Funcional1/exemplos/8_11_erro_not_is" %}\
+{% include code-link.html path="Funcional1/exemplos/8_11_erro_soma_uniao" %}
 
 ## Parser
 

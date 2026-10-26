@@ -1,4 +1,5 @@
 {%- assign filename = include.path | split: "/" | last | split: "." | first -%}
-<a href="https://raw.githubusercontent.com/{{ site.github.owner_name }}/{{site.github.repository_name}}/refs/heads/master/{{ include.path }}" target="_blank" rel="noopener noreferrer">
+{%- assign branch = site.github.source.branch | default: "main" -%}
+<a href="https://raw.githubusercontent.com/{{ site.github.owner_name }}/{{site.github.repository_name}}/refs/heads/{{ branch }}/{{ include.path }}" target="_blank" rel="noopener noreferrer">
     {{ include.content | default: filename }}
-</a>
+</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
